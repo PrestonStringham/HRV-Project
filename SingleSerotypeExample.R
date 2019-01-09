@@ -1,4 +1,4 @@
-# ------ The following script analyzes the infectivity of viruses which have one serotype -------#
+# ------ The following script is an example project for the Diversity of viruses project -------#
 
 b <- 0
 g <- 0
