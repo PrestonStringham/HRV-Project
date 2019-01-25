@@ -8,7 +8,7 @@ library(googlesheets)
 master_sheet <- gs_title("HRV-Experiment")
 
 
-#SET CONSTANTS USING SPREADSHEET#
+#SET CONSTANTS USING SPREADSHEET #
 
 N <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(4)))))
 mu <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(5)))))
@@ -22,12 +22,12 @@ bn <- as.numeric(as.list(gs_simplify_cellfeed(b)))
 g<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(2))
 gn <- as.numeric(as.list(gs_simplify_cellfeed(g)))
 
-parameters <- c(m, mu);
+parameters <- c(m, mu, N);
 
 
 #INITIAL POPULATION DATA#
 
-state <- c(S = 5,  I= 5);
+state <- c(S = 300, I1=3);
 
 
 #CHECK TO SEE IF THERE IS ENOUGH RATES. MAKE SURE DATA IS ENTERED CORRECTLY#
@@ -46,14 +46,15 @@ if(length(bn) != length(gn)){
   model<-function(t, state, parameters) {
     
     with(as.list(c(state, parameters)),{
-  
+      
       dS <- N-S;
       
       for (i in 1:m){
-        dI[i] = (bn[i]*I[i]*S)/N - gn[i]*I[i];
+        dI1 <- (bn[i]*I1*S)/N - gn[i]*I1;
+        assign(paste("dI", i+1, sep = ""), i+1) 
       }
       
-      list(c(dS, dI));
+      return(list(c(dS, dI1)));
       
     })
   };
@@ -66,7 +67,7 @@ if(length(bn) != length(gn)){
   
   par(oma = c(0, 0, 3, 0));
   plot(out, xlab = "time", ylab = "-");
-  plot(out[, "S"], pch = ".");
+  plot(S, I1)
   mtext(outer = TRUE, side = 3, "Diversity Model", cex = 1.5);
    
 }
