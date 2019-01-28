@@ -22,12 +22,15 @@ bn <- as.numeric(as.list(gs_simplify_cellfeed(b)))
 g<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(2))
 gn <- as.numeric(as.list(gs_simplify_cellfeed(g)))
 
+I<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(3))
+In <- as.numeric(as.list(gs_simplify_cellfeed(I)))
+
 parameters <- c(m, mu, N);
 
 
 #INITIAL POPULATION DATA#
 
-state <- c(S = 300, I1=3);
+state <- c(S = 300, In);
 
 
 #CHECK TO SEE IF THERE IS ENOUGH RATES. MAKE SURE DATA IS ENTERED CORRECTLY#
@@ -47,27 +50,29 @@ if(length(bn) != length(gn)){
     
     with(as.list(c(state, parameters)),{
       
-      dS <- N-S;
+      #SUSCEPTIBLE COMPARMTENT#
+      dS <- N-S + gn[1:m]*In;
       
-      for (i in 1:m){
-        dI1 <- (bn[i]*I1*S)/N - gn[i]*I1;
-        assign(paste("dI", i+1, sep = ""), i+1) 
-      }
+      #INFCETED COMPARMENTS FOR GENERATED m SEROTYPES#
+      dIn <- (bn[i]*In[i]*S)/N - gn[i]*In[i];
       
-      return(list(c(dS, dI1)));
+      #RETURNS LIST OF DIFFERENTIALS#
+      return(list(c(dS, dIn)));
       
     })
   };
   
+  #TIMES STEPS#
   times <- seq(0, 10, by = 0.01);
   
+  #SOLVE ODEs#
   library(deSolve);
   out <- ode(y = state, times = times, func = model, parms = parameters);
   head(out);
   
+  #PLOT FIGURES NUMERICALLY#
   par(oma = c(0, 0, 3, 0));
   plot(out, xlab = "time", ylab = "-");
-  plot(S, I1)
   mtext(outer = TRUE, side = 3, "Diversity Model", cex = 1.5);
-   
+
 }
