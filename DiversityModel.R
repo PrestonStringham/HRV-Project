@@ -51,10 +51,10 @@ if(length(bn) != length(gn)){
     with(as.list(c(state, parameters)),{
       
       #SUSCEPTIBLE COMPARMTENT#
-      dS <- N-S + gn[1:m]*In;
+      dS <- N-S + sum(gn*In) + sum(-((bn*In*S)/N));
       
       #INFCETED COMPARMENTS FOR GENERATED m SEROTYPES#
-      dIn <- (bn[i]*In[i]*S)/N - gn[i]*In[i];
+      dIn <- (bn*In*S)/N - gn*In;
       
       #RETURNS LIST OF DIFFERENTIALS#
       return(list(c(dS, dIn)));
