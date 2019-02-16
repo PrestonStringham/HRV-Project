@@ -1,5 +1,5 @@
 #Preston Stringham - 2019#
-# Rhinovirus Diversity Experiment. Required packages: googlsheets, deSolve#
+# Rhinovirus Diversity Experiment. Required packages: googlsheets, deSolve, GillespieSSA#
 
 library(googlesheets)
 
@@ -22,20 +22,23 @@ bn <- as.numeric(as.list(gs_simplify_cellfeed(b)))
 g<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(2))
 gn <- as.numeric(as.list(gs_simplify_cellfeed(g)))
 
+
+#SET INITIAL INFECTED POPULATION DATA#
+
 I<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(3))
 In <- as.numeric(as.list(gs_simplify_cellfeed(I)))
 
-parameters <- c(m, mu, N);
+parameters <- c(m, mu, N)
 
 
 #INITIAL POPULATION DATA#
 
-state <- c(S = 300, In);
+state <- c(S = 300, In)
 
 
 #CHECK TO SEE IF THERE IS ENOUGH RATES. MAKE SURE DATA IS ENTERED CORRECTLY#
 
-if(length(bn) != length(gn)){
+if(length(bn) != length(gn) && length(bn) != length(In)){
   stop("Not enough infection or recovery rates... Please fix...")
 }else{
   
@@ -56,7 +59,7 @@ if(length(bn) != length(gn)){
       #INFCETED COMPARMENTS FOR GENERATED m SEROTYPES#
       dIn <- (bn*In*S)/N - gn*In;
       
-      #RETURNS LIST OF DIFFERENTIALS#
+      #RETURN LIST OF DIFFERENTIALS#
       return(list(c(dS, dIn)));
       
     })
@@ -68,8 +71,10 @@ if(length(bn) != length(gn)){
   #SOLVE ODEs#
   library(deSolve);
   out <- ode(y = state, times = times, func = model, parms = parameters);
+  nu <- matrix(c(-1,0,+1,-1,0,+1),nrow=3,byrow=TRUE);
+  #out1 <- ssa(state, c("N-S + sum(gn*In) + sum(-((bn*In*S)/N))","(bn*In*S)/N - gn*In"), nu, parms = parameters, tf=100, simName="Diversity Model");
   head(out);
-  
+  #ssa.plot(out1);
   #PLOT FIGURES NUMERICALLY#
   par(oma = c(0, 0, 3, 0));
   plot(out, xlab = "time", ylab = "-");

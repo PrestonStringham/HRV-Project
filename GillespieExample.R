@@ -1,0 +1,6 @@
+parms <- c(c1=10, c2=.01, c3=10)
+x0 <- c(Y1=1000,Y2=1000)
+a <- c("c1*Y1","c2*Y1*Y2","c3*Y2")
+nu <- matrix(c(+1,-1,0,0,+1,-1),nrow=2,byrow=TRUE)
+out <- ssa(x0,a,nu,parms,tf=100,method="ETL",simName="Lotka predator-prey model")
+ssa.plot(out)
