@@ -22,9 +22,8 @@ gn <- as.numeric(as.list(gs_simplify_cellfeed(g)))
 
 #SET INITIAL INFECTED POPULATION DATA#
 
-#I<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(3))
-#In <- as.numeric(as.list(gs_simplify_cellfeed(I)))
-In = c(1, 1);
+I<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(3))
+In <- as.numeric(as.list(gs_simplify_cellfeed(I)))
 
 if(length(bn) != length(gn) && length(bn) != length(In)){
   stop("Not enough infection rates, recovery rates, or initial infected population... Please fix...")
@@ -33,37 +32,61 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   m <- length(gn)
   t <- 0
   
-  S <- sum(N-sum(In))
+  S <- N-sum(In)
   
-  Time <- 10 
+  Time <- 10
   
   S_vals <- list(S)
   
-  I_vals <- c(In[1:m])
+  I_vals <-list()
   
-  t_vals <- list(t)
+  for(i in c(1:m)){
+    test <- list(In[i])
+    I_vals[i] <- list(test)
+  }
   
-  i <- 2
-  while (t < Time){
-    w1 <- N-S + sum(gn*In) + sum(-((bn*In*S)/N));
-    w2 <- (bn*In*S)/N - gn*In;
-    for(i in c(1:m)){
-      W <- w1 + w2[[i]]
-      dt <- -log2(runif(1))/W
-      t <- t + dt
+  t_vals <- list()
+  
+  for(i in c(1:m)){
+     val <- list(t)
+     t_vals[i] <- list(val)
+  }
+  
+  for(i in c(1:m)){
+    
+    t <- 0
+    
+    while (t < Time){
       
+      w1 <- (bn[i]*In[i]*S)/N;
+      w2 <- gn[i]*In[i];
+      W <- w1 + w2
+      
+      dt <- -log(runif(1))/W
+      
+      t <- t + dt
+        
       if(runif(1) < w1/W){
         S <- S-1
-        In[[i]] <- In[[i]]+1
+        In[i] <- In[i]+1
       }
+      
       else{
-        In[[i]] <- In[[i]]-1
+        In[i] <- In[i]-1
         S <- S+1
       }
+      
+      #S_vals <- c(S_vals, S)
+      I_vals[[i]] <- c(I_vals[[i]], In[i])
+      t_vals[[i]] <- c(t_vals[[i]], t)
     }
-    S_vals <- c(S_vals, S)
-    I_vals <- c(I_vals, I)
-    t_vals <- c(t_vals, t)
   }
 }
-plot(t_vals, S_vals)
+#plot(t_vals[[1]], S_vals)
+#for(i in c(1:m)){
+par(mfrow=c(2,2))
+  plot(t_vals[[1]], I_vals[[1]])
+  plot(t_vals[[2]], I_vals[[2]])
+  plot(t_vals[[3]], I_vals[[3]])
+  plot(t_vals[[4]], I_vals[[4]])
+#}
