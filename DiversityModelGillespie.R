@@ -8,7 +8,7 @@ master_sheet <- gs_title("HRV-Experiment")
 #SET CONSTANTS USING SPREADSHEET #
 
 N <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(4)))))
-mu <- 3
+mu <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(5)))))
 
 
 #SET INFECTION AND RECOVERY RATES (bn and gn, respectively)#
@@ -58,7 +58,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     
     while (t < Time){
       
-      w1 <- (bn[i]*In[i]*S)/N;
+      w1 <- (mu/(m-1))*(bn[i]*In[i]*S)/N;
       w2 <- gn[i]*In[i];
       W <- w1 + w2
       
