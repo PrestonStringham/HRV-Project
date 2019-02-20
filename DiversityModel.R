@@ -33,7 +33,11 @@ parameters <- c(m, mu, N)
 
 #INITIAL POPULATION DATA#
 
-state <- c(S = 300, In)
+state <- c(S = N-sum(In), In)
+Inms <- paste0("I",1:m)
+nms <- c("S",Inms)
+names(state) <- nms
+dnms <- paste0("d",nms)
 
 
 #CHECK TO SEE IF THERE IS ENOUGH RATES. MAKE SURE DATA IS ENTERED CORRECTLY#
@@ -51,25 +55,30 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   
   model<-function(t, state, parameters) {
     
-    with(as.list(c(state, parameters)),{
+    with(as.list(parameters),{
       
+      S <- state["S"]
+      In <- state[Inms]
       #SUSCEPTIBLE COMPARMTENT#
-      dS <- N-S + sum(gn*In) + sum(-((bn*In*S)/N));
+      dS <- sum(gn*In) - sum(((bn*In*S)/N));
       
       #INFCETED COMPARMENTS FOR GENERATED m SEROTYPES#
       dIn <- (bn*In*S)/N - gn*In;
-      
+      res <- c(dS,dIn)
+      names(res) <- dnms
       #RETURN LIST OF DIFFERENTIALS#
-      return(list(c(dS, dIn)));
+      return(list(res));
       
     })
   };
   
   #TIMES STEPS#
-  times <- seq(0, 10, by = 0.01);
+  tmax <- 150
+  tstep <- 0.1
+  times <- seq(0, tmax, by = tstep);
   
   #SOLVE ODEs#
-  library(deSolve);
+  require(deSolve);
   out <- ode(y = state, times = times, func = model, parms = parameters);
   nu <- matrix(c(-1,0,+1,-1,0,+1),nrow=3,byrow=TRUE);
   #out1 <- ssa(state, c("N-S + sum(gn*In) + sum(-((bn*In*S)/N))","(bn*In*S)/N - gn*In"), nu, parms = parameters, tf=100, simName="Diversity Model");
