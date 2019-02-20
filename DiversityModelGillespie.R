@@ -72,24 +72,24 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     while (time < duration){
       
       #SUM OF THE RATE OF THE EVENTS
-      R1 <- (mu/(m-1))*(bn[i]*In[i]*S)/N;
-      R2 <- gn[i]*In[i];
-      R <- R1 + R2
+      E1 <- (mu/(m-1))*(bn[i]*In[i]*S)/N;
+      E2 <- gn[i]*In[i];
+      E <- E1 + E2
       
       # GENERATE TIME STEP dt
-      dt <- -log(runif(1))/R
+      dt <- -log(runif(1))/E
       
       #ADD dt TO time
       time <- time + dt
       
       #CHOOSE OUTCOME BASED ON RANDOM NUMBER AND SUM OF RATE OF EVENTS
       rand <- runif(1)
-      if(rand < R1/R){
+      if(rand < E1/E){
         S <- S-1
         In[i] <- In[i]+1
         count_1 <- count_1 + 1
       }
-      else if(rand < R2/R){
+      else if(rand < E2/E){
         In[i] <- In[i]-1
         S <- S+1
         count_2 <- count_2 + 1
