@@ -34,6 +34,10 @@ parameters <- c(m, mu, N)
 #INITIAL POPULATION DATA#
 
 state <- c(S = N-sum(In), In)
+
+
+#NAMES
+
 Inms <- paste0("I",1:m)
 nms <- c("S",Inms)
 names(state) <- nms
@@ -80,10 +84,8 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #SOLVE ODEs#
   require(deSolve);
   out <- ode(y = state, times = times, func = model, parms = parameters);
-  nu <- matrix(c(-1,0,+1,-1,0,+1),nrow=3,byrow=TRUE);
-  #out1 <- ssa(state, c("N-S + sum(gn*In) + sum(-((bn*In*S)/N))","(bn*In*S)/N - gn*In"), nu, parms = parameters, tf=100, simName="Diversity Model");
   head(out);
-  #ssa.plot(out1);
+
   #PLOT FIGURES NUMERICALLY#
   par(oma = c(0, 0, 3, 0));
   plot(out, xlab = "time", ylab = "-");
