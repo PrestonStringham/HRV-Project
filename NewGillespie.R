@@ -55,7 +55,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   A[1,1] <- 0
   A[(1:m+1),1] <- -1
   
-  B = do.call(rbind, replicate((1), A, simplify=FALSE))*(-1)
+  B = do.call(rbind, replicate(1, A, simplify=FALSE))*(-1)
   
   M <- rbind(A, B[1:m+1,])
   
@@ -64,8 +64,8 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   
   while (time < duration){
     #SUM OF THE RATE OF THE EVENTS
-    r1 <- (mu/(m-1))*(bn*In*S)/N;
-    r2 <- gn*In;
+    r1 <- (mu/(m-1))*(bn*In*S)/N
+    r2 <- gn*In
     rtot <- sum(r1 + r2)
     
     # GENERATE TIME STEP dt
@@ -92,6 +92,5 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   require(reshape2)
   p <- melt(df, id.vars = 'time', variable.name = 'series')
   ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
-
   
 }
