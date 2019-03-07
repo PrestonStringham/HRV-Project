@@ -77,7 +77,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   };
   
   #TIMES STEPS#
-  tmax <- 150
+  tmax <- 25
   tstep <- 0.1
   times <- seq(0, tmax, by = tstep);
   
@@ -85,10 +85,11 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   require(deSolve);
   out <- ode(y = state, times = times, func = model, parms = parameters);
   head(out);
-
-  #PLOT FIGURES NUMERICALLY#
-  par(oma = c(0, 0, 3, 0));
-  plot(out, xlab = "time", ylab = "-");
-  mtext(outer = TRUE, side = 3, "Diversity Model", cex = 1.5);
-
+  
+  df <- as.data.frame(out)
+  
+  require(ggplot2)
+  require(reshape2)
+  p <- melt(df, id.vars = 'time', variable.name = 'series')
+  ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
 }

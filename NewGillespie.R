@@ -40,22 +40,22 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   time <- 0
   
   #SIMULATION DURATION
-  duration <- 50
+  duration <- 25
   
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
   
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In))
+  names <- c("time", nms)
+  colnames(df) <- names
   
   #CREATE GILLESPIE MATRIX
   A <- diag(m+1)
   A[1,1] <- 0
   A[(1:m+1),1] <- -1
   
-  B <- diag(m+1)*(-1)
-  B[1,1] <- 0
-  B[(1:m+1),1] <- 1
+  B = do.call(rbind, replicate((1), A, simplify=FALSE))*(-1)
   
   M <- rbind(A, B[1:m+1,])
   
@@ -77,15 +77,21 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     #CHOOSE OUTCOME BASED ON RANDOM NUMBER AND SUM OF RATE OF EVENTS
     rand <- runif(1)
     
+    #UPDATE POPULATIONS FROM MATRIX
     var <- sample(1:(2*m+1), 1, prob=c(0.1, r1, r2))
     In <- In + M[var,1:m+1]
     S <- S + M[var, 1]
-    df[index,] <- c(time, as.numeric(as.list(df[index-1,0:m+2])) + M[var,]) 
     
+    #APPEND TO DATA FRAME
+    df[index,] <- c(time, S, In) 
     
     index <- index + 1
   }
-  
-  plot(df[,1], df[,3])
+
+  require(ggplot2)
+  require(reshape2)
+  p <- melt(df, id.vars = 'time', variable.name = 'series')
+  ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
+
   
 }
