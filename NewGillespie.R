@@ -40,30 +40,36 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   time <- 0
   
   #SIMULATION DURATION
-  duration <- 1
+  duration <- 50
   
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
   
   #CREATE DATAFRAME
-  df <- data.frame(time, S, t(Inms[1:m])=t(In))
+  df <- data.frame(time, S, I=t(In))
   
-  #CREATE MATRIX
-  A <- diag(m)
+  #CREATE GILLESPIE MATRIX
+  A <- diag(m+1)
   A[1,1] <- 0
-  A[(2:m),1] <- -1
+  A[(1:m+1),1] <- -1
+  
+  B <- diag(m+1)*(-1)
+  B[1,1] <- 0
+  B[(1:m+1),1] <- 1
+  
+  M <- rbind(A, B[1:m+1,])
   
   #SET DATAFRAME ACCESS INDEX
   index <- nrow(df) + 1
   
   while (time < duration){
     #SUM OF THE RATE OF THE EVENTS
-    E1 <- (mu/(m-1))*(bn*In*S)/N;
-    E2 <- gn*In;
-    E <- sum(E1 + E2)
+    r1 <- (mu/(m-1))*(bn*In*S)/N;
+    r2 <- gn*In;
+    rtot <- sum(r1 + r2)
     
     # GENERATE TIME STEP dt
-    dt <- -log(runif(1))/E
+    dt <- -log(runif(1))/rtot
     
     #ADD dt TO time
     time <- time + dt
@@ -71,9 +77,15 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     #CHOOSE OUTCOME BASED ON RANDOM NUMBER AND SUM OF RATE OF EVENTS
     rand <- runif(1)
     
+    var <- sample(1:(2*m+1), 1, prob=c(0.1, r1, r2))
+    In <- In + M[var,1:m+1]
+    S <- S + M[var, 1]
+    df[index,] <- c(time, as.numeric(as.list(df[index-1,0:m+2])) + M[var,]) 
     
     
     index <- index + 1
   }
+  
+  plot(df[,1], df[,3])
   
 }
