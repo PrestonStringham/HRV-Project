@@ -63,6 +63,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   index <- nrow(df) + 1
   
   while (time < duration){
+    
     #SUM OF THE RATE OF THE EVENTS
     r1 <- (mu/(m-1))*(bn*In*S)/N
     r2 <- gn*In
@@ -86,8 +87,10 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     df[index,] <- c(time, S, In) 
     
     index <- index + 1
+    
   }
 
+  #PLOT USING GGPLOT2
   require(ggplot2)
   require(reshape2)
   p <- melt(df, id.vars = 'time', variable.name = 'series')

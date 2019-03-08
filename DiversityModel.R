@@ -86,8 +86,10 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   out <- ode(y = state, times = times, func = model, parms = parameters);
   head(out);
   
+  #CONVERT OUT TO DATA FRAME IN ORDER TO PLOT USING GGPLOT2 AND RESHAPE2
   df <- as.data.frame(out)
   
+  #PLOT USING GGPLOT2
   require(ggplot2)
   require(reshape2)
   p <- melt(df, id.vars = 'time', variable.name = 'series')
