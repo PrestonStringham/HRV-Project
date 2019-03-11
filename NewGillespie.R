@@ -57,7 +57,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   
   B = do.call(rbind, replicate(1, A, simplify=FALSE))*(-1)
   
-  M <- rbind(A, B[1:m+1,])
+  M <- rbind(A[1:m+1,], B[1:m+1,])
   
   #SET DATAFRAME ACCESS INDEX
   index <- nrow(df) + 1
@@ -79,7 +79,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     rand <- runif(1)
     
     #UPDATE POPULATIONS FROM MATRIX
-    var <- sample(1:(2*m+1), 1, prob=c(0.1, r1, r2))
+    var <- sample(1:(2*m), 1, prob=c(r1, r2))
     In <- In + M[var,1:m+1]
     S <- S + M[var, 1]
     
