@@ -66,6 +66,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     
     #SUM OF THE RATE OF THE EVENTS
     r1 <- (mu/(m-1))*(bn*In*S)/N
+    #r1 <- (1 - mu)*bn*In*S + (mu/m)*sum(bn*In)*S
     r2 <- gn*In
     rtot <- sum(r1 + r2)
     
@@ -89,7 +90,21 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     index <- index + 1
     
   }
-
+  
+  #Save mean bn and gn values of serotypes after simulation.
+  extinct <- c()
+  survivors <- c()
+  for(i in 3:ncol(df)){
+    if(df[nrow(df),i] < 1){
+      extinct <- c(extinct, i-2)
+    }
+    else{
+      survivors <- c(survivors, i-2)
+    }
+  }
+  bn_mean = c(mean(bn[extinct]), mean(bn[survivors]))
+  gn_mean = c(mean(gn[extinct]), mean(gn[survivors]))
+  
   #PLOT USING GGPLOT2
   require(ggplot2)
   require(reshape2)
