@@ -45,6 +45,9 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
   
+  #SELECTED SEROTYPE FOR MUTATION
+  mutated <- 3
+  
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In))
   names <- c("time", nms)
@@ -65,7 +68,8 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   while (time < duration){
     
     #SUM OF THE RATE OF THE EVENTS
-    r1 <- (mu/(m-1))*(bn*In*S)/N
+    r1 <- (mu/m)*(bn*In*S)/N
+    r1[mutated] <- (1-mu)*(bn[mutated]*In[mutated]*S)/N
     #r1 <- (1 - mu)*bn*In*S + (mu/m)*sum(bn*In)*S
     r2 <- gn*In
     rtot <- sum(r1 + r2)
