@@ -33,20 +33,18 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #SET NAMES
   Inms <- paste0("I",1:m)
   nms <- c("S",Inms)
-  #names(state) <- nms
-  dnms <- paste0("d",nms)
   
   #INITIAL TIME
   time <- 0
   
   #SIMULATION DURATION
-  duration <- 25
+  duration <- 50
   
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
   
   #SELECTED SEROTYPE FOR MUTATION
-  mutated <- 3
+  selected <- 3
   
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In))
@@ -68,9 +66,8 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   while (time < duration){
     
     #SUM OF THE RATE OF THE EVENTS
-    r1 <- (mu/m)*(bn*In*S)/N
-    r1[mutated] <- (1-mu)*(bn[mutated]*In[mutated]*S)/N
-    #r1 <- (1 - mu)*bn*In*S + (mu/m)*sum(bn*In)*S
+    r1 <- (mu)*(bn*In*S)/N
+    r1[selected] <- (1-mu)*(bn[selected]*In[selected]*S)/N
     r2 <- gn*In
     rtot <- sum(r1 + r2)
     
@@ -106,8 +103,15 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
       survivors <- c(survivors, i-2)
     }
   }
-  bn_mean = c(mean(bn[extinct]), mean(bn[survivors]))
-  gn_mean = c(mean(gn[extinct]), mean(gn[survivors]))
+  bn_means <- c(mean(bn[extinct]), mean(bn[survivors]))
+  gn_means <- c(mean(gn[extinct]), mean(gn[survivors]))
+  df_means <- data.frame(bn_means[1], bn_means[2])
+  df_means <- rbind(df_means, gn_means)
+  
+  mean_names <- c("Extinct Mean", "Surivivor Mean")
+  rate_names <- c("bn", "gn")
+  rownames(df_means) <- rate_names
+  colnames(df_means) <- mean_names
   
   #PLOT USING GGPLOT2
   require(ggplot2)
