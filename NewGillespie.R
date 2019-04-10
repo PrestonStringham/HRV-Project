@@ -44,7 +44,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   S <- N-sum(In)
   
   #SELECTED SEROTYPE FOR MUTATION
-  selected <- 3
+  selected <- 2
   
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In))
@@ -66,8 +66,8 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   while (time < duration){
     
     #SUM OF THE RATE OF THE EVENTS
-    r1 <- (mu)*(bn*In*S)/N
-    r1[selected] <- (1-mu)*(bn[selected]*In[selected]*S)/N
+    r1 <- (1-mu)*(bn*In*S)/N + (mu/m)*sum(bn*In)*S/N
+    #r1[selected] <- (1-mu)*(bn[selected]*In[selected]*S)/N
     r2 <- gn*In
     rtot <- sum(r1 + r2)
     
@@ -116,6 +116,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #PLOT USING GGPLOT2
   require(ggplot2)
   require(reshape2)
+  last_row <- df[nrow(df),]
   p <- melt(df, id.vars = 'time', variable.name = 'series')
   ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
   
