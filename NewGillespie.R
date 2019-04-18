@@ -1,34 +1,29 @@
 #Preston Stringham - January 2019#
-# Rhinovirus Diversity Experiment. Required packages: googlesheets, ggplot2#
-library(googlesheets)
+# Rhinovirus Diversity Experiment. Required packages: reshape2, ggplot2#
 
-#ACCESS SPREADSHEET#
-master_sheet <- gs_title("HRV-Experiment")
+m <- 100
 
+#SET gn TO GET m
+gn <- c(runif(m, 0.3, 0.3))
 
-#SET CONSTANTS USING SPREADSHEET #
-N <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(4)))))
-mu <- as.numeric(as.list(gs_simplify_cellfeed(gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(5)))))
+#m SEROTYPES
+m <- length(gn)
 
+N <- 500
+mu <- 0.01
 
-#SET INFECTION AND RECOVERY RATES (bn and gn, respectively)#
-b<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(1))
-bn <- as.numeric(as.list(gs_simplify_cellfeed(b)))
-
-g<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(2))
-gn <- as.numeric(as.list(gs_simplify_cellfeed(g)))
-
+#UNIFORMLY SELECT bn VALUES FOR m SEROTYPES
+bn_lower = 0.3
+bn_upper = 0.7
+bn <- runif(m, bn_lower, bn_upper)
 
 #SET INITIAL INFECTED POPULATION DATA#
-I<-gs_read_cellfeed(master_sheet, ws = 1, range=cell_cols(3))
-In <- as.numeric(as.list(gs_simplify_cellfeed(I)))
+In <- c(runif(m, 5, 5))
 
+#MAKE SURE CONDITIONS HAVE SAME LENGTH
 if(length(bn) != length(gn) && length(bn) != length(In)){
   stop("Not enough infection rates, recovery rates, or initial infected population... Please fix...")
 }else{
-  
-  #m SEROTYPES
-  m <- length(gn)
   
   #SET NAMES
   Inms <- paste0("I",1:m)
@@ -46,9 +41,12 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #SELECTED SEROTYPE FOR MUTATION
   selected <- 2
   
+  #SIMPSON INDEX
+  simp = sum(In)
+    
   #CREATE DATAFRAME
-  df <- data.frame(time, S, I=t(In))
-  names <- c("time", nms)
+  df <- data.frame(time, S, I=t(In), simp)
+  names <- c("time", nms, "Diversity")
   colnames(df) <- names
   
   #CREATE GILLESPIE MATRIX
@@ -85,8 +83,11 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     In <- In + M[var,1:m+1]
     S <- S + M[var, 1]
     
+    #RECALCULATE SIMPSON INDEX
+    simp = sum(In)
+    
     #APPEND TO DATA FRAME
-    df[index,] <- c(time, S, In) 
+    df[index,] <- c(time, S, In, simp) 
     
     index <- index + 1
     
