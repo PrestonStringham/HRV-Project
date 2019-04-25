@@ -1,7 +1,8 @@
-#Preston Stringham - January 2019#
-# Rhinovirus Diversity Experiment. Required packages: reshape2, ggplot2#
+#Preston Stringham - January 2019
+# Rhinovirus Diversity Experiment. Required packages: reshape2, ggplot2
 
-m <- 100
+#NUMBER OF SEROTYPES
+m <- 10
 
 #SET gn TO GET m
 gn <- c(runif(m, 0.3, 0.3))
@@ -9,12 +10,12 @@ gn <- c(runif(m, 0.3, 0.3))
 #m SEROTYPES
 m <- length(gn)
 
-N <- 500
+N <- 1000
 mu <- 0.01
 
 #UNIFORMLY SELECT bn VALUES FOR m SEROTYPES
-bn_lower = 0.3
-bn_upper = 0.7
+bn_lower = 0.5
+bn_upper = 0.8
 bn <- runif(m, bn_lower, bn_upper)
 
 #SET INITIAL INFECTED POPULATION DATA#
@@ -27,13 +28,13 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   
   #SET NAMES
   Inms <- paste0("I",1:m)
-  nms <- c("S",Inms)
+  nms <- c("S", Inms)
   
   #INITIAL TIME
   time <- 0
   
   #SIMULATION DURATION
-  duration <- 50
+  duration <- 10
   
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
@@ -42,7 +43,9 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   selected <- 2
   
   #SIMPSON INDEX
-  simp = sum(In)
+  simp_num = In[1:m]^2
+  simp_den = sum(In)^2
+  simp = sum(simp_num/simp_den)
     
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In), simp)
@@ -84,7 +87,9 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
     S <- S + M[var, 1]
     
     #RECALCULATE SIMPSON INDEX
-    simp = sum(In)
+    simp_num = In[1:m]^2
+    simp_den = sum(In)^2
+    simp = sum(simp_num/simp_den)
     
     #APPEND TO DATA FRAME
     df[index,] <- c(time, S, In, simp) 
@@ -117,8 +122,17 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #PLOT USING GGPLOT2
   require(ggplot2)
   require(reshape2)
-  last_row <- df[nrow(df),]
-  p <- melt(df, id.vars = 'time', variable.name = 'series')
-  ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
   
+  p <- melt(df, id.vars = 'time', variable.name = 'series')
+  
+  #PLOT FOR EACH SEROTYPE
+  #ggplot(p, aes(time,value)) + geom_line() + facet_wrap(.~series, ncol=3)
+
+  #ALL SEROTYPES ON ONE PLOT
+  print(ggplot(p, aes(time, value)) + geom_line(aes(colour = series)))
+  
+  #PLOT DIVERSITY
+  #lines(df[,1], df[,ncol(df)])
+  #p2 <- ggplot(p, aes(time, value)) + geom_line(data=subset())
+  print(ggplot(df, aes(x=time, y = Diversity)) + geom_line())
 }
