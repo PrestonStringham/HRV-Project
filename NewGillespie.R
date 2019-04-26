@@ -34,7 +34,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   time <- 0
   
   #SIMULATION DURATION
-  duration <- 10
+  duration <- 100
   
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
@@ -135,4 +135,7 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #lines(df[,1], df[,ncol(df)])
   #p2 <- ggplot(p, aes(time, value)) + geom_line(data=subset())
   print(ggplot(df, aes(x=time, y = Diversity)) + geom_line())
+  
+  
+  print(plot(bn,unlist(df[nrow(df),Inms])))
 }
