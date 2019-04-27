@@ -39,14 +39,10 @@ if(length(bn) != length(gn) && length(bn) != length(In)){
   #INITIAL SUSCEPTIBLE POPULATION
   S <- N-sum(In)
   
-  #SELECTED SEROTYPE FOR MUTATION
-  selected <- 2
-  
   #SIMPSON INDEX
   simp_num = In[1:m]^2
   simp_den = sum(In)^2
   simp = sum(simp_num/simp_den)
-    
   #CREATE DATAFRAME
   df <- data.frame(time, S, I=t(In), simp)
   names <- c("time", nms, "Diversity")
